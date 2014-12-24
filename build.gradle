@@ -1,0 +1,83 @@
+buildscript {
+    ext {
+        springBootVersion = '1.2.0.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+apply plugin: 'groovy'
+apply plugin: 'spring-boot' 
+apply plugin: 'checkstyle'
+apply plugin: 'codenarc'
+apply plugin: 'maven-publish'
+apply plugin: 'jacoco'
+
+jar {
+    baseName = 'demo'
+    version = '0.0.1-SNAPSHOT'
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile("org.springframework.boot:spring-boot-starter")
+    compile("org.codehaus.groovy:groovy")
+    testCompile("org.springframework.boot:spring-boot-starter-test")
+}
+
+jacocoTestReport.group = 'Verification'
+
+task functionalTests {
+    group = 'Verification'
+    description = 'Runs component- and integration-level tests'
+}
+functionalTests.dependsOn test
+
+task ciAssemble {
+    group = 'Continuous Integration'
+    description = 'compiles, assembles and inspects the code'
+}
+
+ciAssemble.dependsOn  assemble
+
+task ciUnitTest {
+    group = 'Continuous Integration'
+    description = 'Run unit-level tests'
+}
+
+ciUnitTest.dependsOn ciAssemble, test
+
+task ciFunctionalTest {
+    group = 'Continuous Integration'
+    description = 'Runs functional tests'
+}
+
+ciFunctionalTest.dependsOn ciUnitTest, functionalTests
+
+task ciInspection {
+    group = 'Continuous Integration'
+    description = 'Runs code inspections'
+}
+ciInspection.dependsOn ciFunctionalTest, checkstyleMain, checkstyleTest, codenarcMain, codenarcTest
+
+task ciPublication {
+    group = 'Continuous Integration'
+    description = 'Publishes verified artifacts'
+}
+ciPublication.dependsOn ciInspection, javadoc, groovydoc, publish, publishToMavenLocal
+
+task ciRegistration {
+    group = 'Continuous Integration'
+    description = 'Registers the artifact with the self-service deployment system'
+}
+ciPublication.dependsOn ciRegistration
