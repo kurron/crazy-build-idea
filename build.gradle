@@ -43,12 +43,18 @@ task functionalTests {
 }
 functionalTests.dependsOn test
 
+task ciSourceInspection {
+    group = 'Continuous Integration'
+    description = 'Runs source code inspections'
+}
+ciSourceInspection.dependsOn checkstyleMain, checkstyleTest, codenarcMain, codenarcTest
+
 task ciAssemble {
     group = 'Continuous Integration'
     description = 'compiles, assembles and inspects the code'
 }
 
-ciAssemble.dependsOn  assemble
+ciAssemble.dependsOn  assemble, ciSourceInspection
 
 task ciUnitTest {
     group = 'Continuous Integration'
@@ -64,17 +70,17 @@ task ciFunctionalTest {
 
 ciFunctionalTest.dependsOn ciUnitTest, functionalTests
 
-task ciInspection {
+task ciByteCodeInspection {
     group = 'Continuous Integration'
-    description = 'Runs code inspections'
+    description = 'Runs byte code inspections'
 }
-ciInspection.dependsOn ciFunctionalTest, checkstyleMain, checkstyleTest, codenarcMain, codenarcTest
+ciByteCodeInspection.dependsOn ciFunctionalTest
 
 task ciPublication {
     group = 'Continuous Integration'
     description = 'Publishes verified artifacts'
 }
-ciPublication.dependsOn ciInspection, javadoc, groovydoc, publish, publishToMavenLocal
+ciPublication.dependsOn ciByteCodeInspection, javadoc, groovydoc, publish, publishToMavenLocal
 
 task ciRegistration {
     group = 'Continuous Integration'
