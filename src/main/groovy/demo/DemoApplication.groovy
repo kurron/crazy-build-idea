@@ -5,6 +5,9 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
 
+/**
+ * This class bootstraps the application.
+ */
 @Configuration
 @ComponentScan
 @EnableAutoConfiguration
