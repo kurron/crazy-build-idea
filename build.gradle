@@ -31,7 +31,7 @@ repositories {
 }
 
 ext {
-    spockVersion = '1.2.0.RELEASE'
+    spockVersion = '0.7-groovy-2.0'
 }
 
 dependencies {
@@ -42,6 +42,12 @@ dependencies {
         exclude module: 'groovy-all'
         exclude module: 'junit-dep'
     }
+}
+
+test {
+    scanForTestClasses = false
+    includes = ['**/*UnitTest.class']
+    maxParallelForks = Runtime.runtime.availableProcessors()
 }
 
 jacocoTestReport.group = 'Verification'
