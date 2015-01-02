@@ -44,6 +44,12 @@ dependencies {
     }
 }
 
+// for all tests
+test {
+    scanForTestClasses = false
+    includes = []
+    maxParallelForks = Runtime.runtime.availableProcessors()
+}
 
 jacocoTestReport.group = 'Verification'
 
@@ -71,9 +77,7 @@ task ciUnitTest {
     description = 'Run unit-level tests'
 
     test {
-        scanForTestClasses = false
-        includes = ['**/*UnitTest.class']
-        maxParallelForks = Runtime.runtime.availableProcessors()
+        includes << '**/*UnitTest.class'
     }
 }
 
