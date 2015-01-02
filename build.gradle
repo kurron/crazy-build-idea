@@ -74,6 +74,12 @@ task ciUnitTest( type: Test ) {
     includes = ['**/*UnitTest.class']
     maxParallelForks = Runtime.runtime.availableProcessors()
     testLogging.showStandardStreams = true
+
+    jacoco {
+        append = true
+        destinationFile = file("$buildDir/jacoco/jacocoTest.exec")
+        classDumpFile = file("$buildDir/jacoco/classpathdumps")
+    }
 }
 
 ciUnitTest.dependsOn ciAssemble
@@ -85,6 +91,12 @@ task ciComponentTest( type: Test ) {
     includes = ['**/*ComponentTest.class']
     maxParallelForks = Runtime.runtime.availableProcessors()
     testLogging.showStandardStreams = true
+
+    jacoco {
+        append = true
+        destinationFile = file("$buildDir/jacoco/jacocoTest.exec")
+        classDumpFile = file("$buildDir/jacoco/classpathdumps")
+    }
 }
 
 task ciIntegrationTest( type: Test ) {
@@ -94,6 +106,12 @@ task ciIntegrationTest( type: Test ) {
     includes = ['**/*IntegrationTest.class']
     maxParallelForks = Runtime.runtime.availableProcessors()
     testLogging.showStandardStreams = true
+
+    jacoco {
+        append = true
+        destinationFile = file("$buildDir/jacoco/jacocoTest.exec")
+        classDumpFile = file("$buildDir/jacoco/classpathdumps")
+    }
 }
 
 task ciFunctionalTest {
