@@ -78,16 +78,20 @@ task ciUnitTest( type: Test ) {
 
 ciUnitTest.dependsOn ciAssemble
 
-task ciFunctionalTest( type: Test ) {
+task ciComponentTest( type: Test ) {
     group = 'Continuous Integration'
-    description = 'Runs functional tests'
+    description = 'Runs component-level tests'
     scanForTestClasses = false
     includes = ['**/*ComponentTest.class']
     maxParallelForks = Runtime.runtime.availableProcessors()
     testLogging.showStandardStreams = true
 }
 
-ciFunctionalTest.dependsOn ciUnitTest
+task ciFunctionalTest {
+    group = 'Continuous Integration'
+    description = 'Runs functional tests'
+}
+ciFunctionalTest.dependsOn ciUnitTest, ciComponentTest
 
 task ciByteCodeInspection {
     group = 'Continuous Integration'
