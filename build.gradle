@@ -54,12 +54,6 @@ test {
 
 jacocoTestReport.group = 'Verification'
 
-task functionalTests {
-    group = 'Verification'
-    description = 'Runs component- and integration-level tests'
-}
-functionalTests.dependsOn test
-
 task ciSourceInspection {
     group = 'Continuous Integration'
     description = 'Runs source code inspections'
@@ -84,16 +78,16 @@ task ciUnitTest( type: Test ) {
 
 ciUnitTest.dependsOn ciAssemble
 
-task ciFunctionalTest {
+task ciFunctionalTest( type: Test ) {
     group = 'Continuous Integration'
     description = 'Runs functional tests'
-
-    test {
-        includes << '**/*ComponentTest.class'
-    }
+    scanForTestClasses = false
+    includes = ['**/*ComponentTest.class']
+    maxParallelForks = Runtime.runtime.availableProcessors()
+    testLogging.showStandardStreams = true
 }
 
-ciFunctionalTest.dependsOn ciUnitTest, functionalTests
+ciFunctionalTest.dependsOn ciUnitTest
 
 task ciByteCodeInspection {
     group = 'Continuous Integration'
