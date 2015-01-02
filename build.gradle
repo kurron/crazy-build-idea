@@ -44,11 +44,6 @@ dependencies {
     }
 }
 
-test {
-    scanForTestClasses = false
-    includes = ['**/*UnitTest.class']
-    maxParallelForks = Runtime.runtime.availableProcessors()
-}
 
 jacocoTestReport.group = 'Verification'
 
@@ -74,6 +69,12 @@ ciAssemble.dependsOn  assemble, ciSourceInspection
 task ciUnitTest {
     group = 'Continuous Integration'
     description = 'Run unit-level tests'
+
+    test {
+        scanForTestClasses = false
+        includes = ['**/*UnitTest.class']
+        maxParallelForks = Runtime.runtime.availableProcessors()
+    }
 }
 
 ciUnitTest.dependsOn ciAssemble, test
