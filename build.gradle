@@ -87,11 +87,20 @@ task ciComponentTest( type: Test ) {
     testLogging.showStandardStreams = true
 }
 
+task ciIntegrationTest( type: Test ) {
+    group = 'Continuous Integration'
+    description = 'Runs integration-level tests'
+    scanForTestClasses = false
+    includes = ['**/*IntegrationTest.class']
+    maxParallelForks = Runtime.runtime.availableProcessors()
+    testLogging.showStandardStreams = true
+}
+
 task ciFunctionalTest {
     group = 'Continuous Integration'
     description = 'Runs functional tests'
 }
-ciFunctionalTest.dependsOn ciUnitTest, ciComponentTest
+ciFunctionalTest.dependsOn ciUnitTest, ciComponentTest, ciIntegrationTest
 
 task ciByteCodeInspection {
     group = 'Continuous Integration'
