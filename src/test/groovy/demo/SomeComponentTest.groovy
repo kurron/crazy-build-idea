@@ -10,7 +10,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
  */
 @RunWith(SpringJUnit4ClassRunner)
 @SpringApplicationConfiguration(classes = DemoApplication)
-class DemoApplicationTests {
+class SomeComponentTest {
 
 	@Test
 	void contextLoads() {

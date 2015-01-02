@@ -48,6 +48,7 @@ dependencies {
 test {
     scanForTestClasses = false
     includes = []
+    excludes = ['**/*Test.class']
     maxParallelForks = Runtime.runtime.availableProcessors()
 }
 
@@ -72,20 +73,24 @@ task ciAssemble {
 
 ciAssemble.dependsOn  assemble, ciSourceInspection
 
-task ciUnitTest {
+task ciUnitTest( type: Test ) {
     group = 'Continuous Integration'
     description = 'Run unit-level tests'
-
-    test {
-        includes << '**/*UnitTest.class'
-    }
+    scanForTestClasses = false
+    includes = ['**/*UnitTest.class']
+    maxParallelForks = Runtime.runtime.availableProcessors()
+    testLogging.showStandardStreams = true
 }
 
-ciUnitTest.dependsOn ciAssemble, test
+ciUnitTest.dependsOn ciAssemble
 
 task ciFunctionalTest {
     group = 'Continuous Integration'
     description = 'Runs functional tests'
+
+    test {
+        includes << '**/*ComponentTest.class'
+    }
 }
 
 ciFunctionalTest.dependsOn ciUnitTest, functionalTests
