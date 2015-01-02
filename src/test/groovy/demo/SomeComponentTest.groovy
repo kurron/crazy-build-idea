@@ -1,20 +1,27 @@
 package demo
 
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.springframework.boot.test.SpringApplicationConfiguration
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
+import groovy.util.logging.Slf4j
+import org.springframework.boot.test.SpringApplicationContextLoader
+import org.springframework.test.context.ContextConfiguration
+import spock.lang.Specification
 
 /**
  * Component-level test.
  */
-@RunWith(SpringJUnit4ClassRunner)
-@SpringApplicationConfiguration(classes = DemoApplication)
-class SomeComponentTest {
+@Slf4j
+@ContextConfiguration(loader = SpringApplicationContextLoader, classes = DemoApplication )
+class SomeComponentTest extends Specification {
 
-	@Test
-	void contextLoads() {
-		assert 1 == 2 - 1
+	def 'exercise loading the context'() {
+
+		given:
+		log.debug( 'running component test' )
+		def i = 10
+
+		when:
+		i += 1
+
+		then:
+		i == 11
 	}
-
 }
