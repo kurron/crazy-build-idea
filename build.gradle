@@ -18,11 +18,6 @@ apply plugin: 'maven-publish'
 apply plugin: 'jacoco'
 apply plugin: 'idea'
 
-jar {
-    baseName = 'demo'
-    version = '0.0.1-SNAPSHOT'
-}
-
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
@@ -147,6 +142,9 @@ publishing {
         }
     }
     publications {
+        binaries( MavenPublication ) {
+            artifact( jar )
+        }
         source( MavenPublication ) {
             artifact( sourceJar ) {
                 classifier = 'source'
