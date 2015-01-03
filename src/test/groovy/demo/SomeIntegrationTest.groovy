@@ -1,6 +1,7 @@
 package demo
 
 import groovy.util.logging.Slf4j
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.IntegrationTest
 import org.springframework.boot.test.SpringApplicationContextLoader
 import org.springframework.test.context.ContextConfiguration
@@ -14,16 +15,19 @@ import spock.lang.Specification
 @IntegrationTest
 class SomeIntegrationTest extends Specification {
 
-	def 'exercise loading the context'() {
+	@Autowired
+	private DemoIntegrationPoint sut
+
+	def 'exercise integration'() {
 
 		given:
 		log.debug( 'running integration test' )
-		def i = 10
+		sut
 
 		when:
-		i += 1
+		def result = sut.echo( 'hello' )
 
 		then:
-		i == 11
+		'hello' == result
 	}
 }
