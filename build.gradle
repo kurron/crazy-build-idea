@@ -53,20 +53,13 @@ test {
 }
 
 
-task ciSourceInspection {
+task sourceCodeInspection {
     group = 'Continuous Integration'
     description = 'Runs source code inspections'
 }
-ciSourceInspection.dependsOn checkstyleMain, checkstyleTest, codenarcMain, codenarcTest
+sourceCodeInspection.dependsOn checkstyleMain, checkstyleTest, codenarcMain, codenarcTest
 
-task ciAssemble {
-    group = 'Continuous Integration'
-    description = 'compiles, assembles and inspects the code'
-}
-
-ciAssemble.dependsOn  assemble, ciSourceInspection
-
-task ciUnitTest( type: Test ) {
+task unitTest( type: Test ) {
     group = 'Continuous Integration'
     description = 'Run unit-level tests'
     scanForTestClasses = false
@@ -76,9 +69,9 @@ task ciUnitTest( type: Test ) {
 
 }
 
-ciUnitTest.dependsOn ciAssemble
+unitTest.dependsOn testClasses
 
-task ciComponentTest( type: Test ) {
+task componentTest( type: Test ) {
     group = 'Continuous Integration'
     description = 'Runs component-level tests'
     scanForTestClasses = false
@@ -86,8 +79,9 @@ task ciComponentTest( type: Test ) {
     maxParallelForks = Runtime.runtime.availableProcessors()
     testLogging.showStandardStreams = true
 }
+componentTest.dependsOn testClasses
 
-task ciIntegrationTest( type: Test ) {
+task integrationTest( type: Test ) {
     group = 'Continuous Integration'
     description = 'Runs integration-level tests'
     scanForTestClasses = false
@@ -95,15 +89,15 @@ task ciIntegrationTest( type: Test ) {
     maxParallelForks = Runtime.runtime.availableProcessors()
     testLogging.showStandardStreams = true
 }
+integrationTest.dependsOn testClasses
 
-task ciFunctionalTest {
-    group = 'Continuous Integration'
-    description = 'Runs functional tests'
-}
-ciFunctionalTest.dependsOn ciUnitTest, ciComponentTest, ciIntegrationTest
+task codeCoverageReport( type:JacocoReport ){
+    executionData = files( "$buildDir/jacoco/componentTest.exec",
+                           "$buildDir/jacoco/integrationTest.exec",
+                           "$buildDir/jacoco/unitTest.exec" )
+    sourceDirectories = files( "$projectDir/src/main/groovy", "$projectDir/src/main/java" )
+    classDirectories = files( "$projectDir/build/classes/main" )
 
-task ciCodeCoverageReport( type:JacocoReport ){
-    executionData = files( "$buildDir/jacoco/ciComponentTest.exec", "$buildDir/jacoco/ciIntegrationTest.exec", "$buildDir/jacoco/ciUnitTest.exec")
     group = 'Continuous Integration'
     reports {
         xml.enabled true
@@ -112,23 +106,51 @@ task ciCodeCoverageReport( type:JacocoReport ){
     }
 }
 
-ciCodeCoverageReport.dependsOn ciFunctionalTest
+codeCoverageReport.dependsOn unitTest, componentTest, integrationTest
 
-task ciByteCodeInspection {
+task byteCodeInspection {
     group = 'Continuous Integration'
     description = 'Runs byte code inspections'
 }
-ciByteCodeInspection.dependsOn ciCodeCoverageReport
+byteCodeInspection.dependsOn codeCoverageReport
 
-task ciPublication {
+task publication {
     group = 'Continuous Integration'
     description = 'Publishes verified artifacts'
 }
-ciPublication.dependsOn ciByteCodeInspection, javadoc, groovydoc, publish, publishToMavenLocal
+publication.dependsOn publish, publishToMavenLocal
 
-task ciRegistration {
+task registration {
     group = 'Continuous Integration'
     description = 'Registers the artifact with the self-service deployment system'
 }
-ciPublication.dependsOn ciRegistration
 
+task stageOne {
+    group = 'Continuous Integration'
+    description = 'Executes the first stage of the CI build pipeline'
+}
+stageOne.dependsOn assemble, testClasses, sourceCodeInspection, javadoc, groovydoc
+
+        task stageTwo {
+    group = 'Continuous Integration'
+    description = 'Executes the second stage of the CI build pipeline'
+}
+stageTwo.dependsOn stageOne, unitTest
+
+task stageThree {
+    group = 'Continuous Integration'
+    description = 'Executes the third stage of the CI build pipeline'
+}
+stageThree.dependsOn stageTwo, componentTest, integrationTest
+
+task stageFour {
+    group = 'Continuous Integration'
+    description = 'Executes the fourth stage of the CI build pipeline'
+}
+stageFour.dependsOn stageThree, byteCodeInspection
+
+task stageFive {
+    group = 'Continuous Integration'
+    description = 'Executes the fifth stage of the CI build pipeline'
+}
+stageFive.dependsOn stageFour, publication, registration
