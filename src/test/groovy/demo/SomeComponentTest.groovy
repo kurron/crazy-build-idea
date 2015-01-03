@@ -1,6 +1,7 @@
 package demo
 
 import groovy.util.logging.Slf4j
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.SpringApplicationContextLoader
 import org.springframework.test.context.ContextConfiguration
 import spock.lang.Specification
@@ -12,16 +13,19 @@ import spock.lang.Specification
 @ContextConfiguration(loader = SpringApplicationContextLoader, classes = DemoApplication )
 class SomeComponentTest extends Specification {
 
-	def 'exercise loading the context'() {
+	@Autowired
+	private DemoComponent sut
+
+	def 'exercise component'() {
 
 		given:
 		log.debug( 'running component test' )
-		def i = 10
+		sut
 
 		when:
-		i += 1
+		def result = sut.echo( 'hello' )
 
 		then:
-		i == 11
+		'hello' == result
 	}
 }
