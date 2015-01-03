@@ -30,6 +30,9 @@ repositories {
     jcenter()
 }
 
+group = 'org.kurron'
+version = '0.1.0'
+
 ext {
     spockVersion = '0.7-groovy-2.0'
 }
@@ -68,7 +71,6 @@ task unitTest( type: Test ) {
     testLogging.showStandardStreams = true
 
 }
-
 unitTest.dependsOn testClasses
 
 task componentTest( type: Test ) {
@@ -129,6 +131,11 @@ task sourceJar( type: Jar ) {
     classifier 'source'
 }
 
+task testSourceJar( type: Jar ) {
+    from( sourceSets.test.java, sourceSets.test.groovy )
+    classifier 'test-source'
+}
+
 publishing {
     repositories {
         maven {
@@ -141,9 +148,13 @@ publishing {
     }
     publications {
         source( MavenPublication ) {
-            from components.java
             artifact( sourceJar ) {
                 classifier = 'source'
+            }
+        }
+        testSource( MavenPublication ) {
+            artifact( testSourceJar ) {
+                classifier = 'test-source'
             }
         }
     }
@@ -153,7 +164,7 @@ task stageOne {
     group = 'Continuous Integration'
     description = 'Executes the first stage of the CI build pipeline'
 }
-stageOne.dependsOn assemble, testClasses, sourceCodeInspection, javadoc, groovydoc, sourceJar
+stageOne.dependsOn assemble, testClasses, sourceCodeInspection, javadoc, groovydoc, sourceJar, testSourceJar
 
 task stageTwo {
     group = 'Continuous Integration'
