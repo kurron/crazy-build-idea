@@ -102,11 +102,23 @@ task ciFunctionalTest {
 }
 ciFunctionalTest.dependsOn ciUnitTest, ciComponentTest, ciIntegrationTest
 
+task ciCodeCoverageReport( type:JacocoReport ){
+    executionData = files( "$buildDir/jacoco/ciComponentTest.exec", "$buildDir/jacoco/ciIntegrationTest.exec", "$buildDir/jacoco/ciUnitTest.exec")
+    group = 'Continuous Integration'
+    reports {
+        xml.enabled true
+        csv.enabled false
+        html.enabled true
+    }
+}
+
+ciCodeCoverageReport.dependsOn ciFunctionalTest
+
 task ciByteCodeInspection {
     group = 'Continuous Integration'
     description = 'Runs byte code inspections'
 }
-ciByteCodeInspection.dependsOn ciFunctionalTest
+ciByteCodeInspection.dependsOn ciCodeCoverageReport
 
 task ciPublication {
     group = 'Continuous Integration'
@@ -120,15 +132,3 @@ task ciRegistration {
 }
 ciPublication.dependsOn ciRegistration
 
-task codeCoverageReport( type:JacocoReport ){
-    executionData = files( "$buildDir/jacoco/ciComponentTest.exec", "$buildDir/jacoco/ciIntegrationTest.exec", "$buildDir/jacoco/ciUnitTest.exec")
-    sourceSets sourceSets.main
-    group = 'Verification'
-    reports {
-        xml.enabled true
-        csv.enabled false
-        html.enabled true
-    }
-}
-
-codeCoverageReport.dependsOn ciFunctionalTest
