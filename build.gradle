@@ -106,8 +106,6 @@ task codeCoverageReport( type:JacocoReport ){
     }
 }
 
-codeCoverageReport.dependsOn unitTest, componentTest, integrationTest
-
 task byteCodeInspection {
     group = 'Continuous Integration'
     description = 'Runs byte code inspections'
@@ -131,26 +129,26 @@ task stageOne {
 }
 stageOne.dependsOn assemble, testClasses, sourceCodeInspection, javadoc, groovydoc
 
-        task stageTwo {
+task stageTwo {
     group = 'Continuous Integration'
     description = 'Executes the second stage of the CI build pipeline'
 }
-stageTwo.dependsOn stageOne, unitTest
+stageTwo.dependsOn unitTest
 
 task stageThree {
     group = 'Continuous Integration'
     description = 'Executes the third stage of the CI build pipeline'
 }
-stageThree.dependsOn stageTwo, componentTest, integrationTest
+stageThree.dependsOn componentTest, integrationTest
 
 task stageFour {
     group = 'Continuous Integration'
     description = 'Executes the fourth stage of the CI build pipeline'
 }
-stageFour.dependsOn stageThree, byteCodeInspection
+stageFour.dependsOn byteCodeInspection
 
 task stageFive {
     group = 'Continuous Integration'
     description = 'Executes the fifth stage of the CI build pipeline'
 }
-stageFive.dependsOn stageFour, publication, registration
+stageFive.dependsOn publication, registration
