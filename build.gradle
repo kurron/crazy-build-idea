@@ -116,18 +116,44 @@ task publication {
     group = 'Continuous Integration'
     description = 'Publishes verified artifacts'
 }
-publication.dependsOn publish, publishToMavenLocal
+//publication.dependsOn publish, publishToMavenLocal
+publication.dependsOn publishToMavenLocal
 
 task registration {
     group = 'Continuous Integration'
     description = 'Registers the artifact with the self-service deployment system'
 }
 
+task sourceJar( type: Jar ) {
+    from( sourceSets.main.java, sourceSets.main.groovy )
+    classifier 'source'
+}
+
+publishing {
+    repositories {
+        maven {
+            url = 'http://192.168.254.81:81/artifactory/publishing-test'
+            credentials {
+                username = 'SVNBuild'
+                password = 'Snoopy*09'
+            }
+        }
+    }
+    publications {
+        source( MavenPublication ) {
+            from components.java
+            artifact( sourceJar ) {
+                classifier = 'source'
+            }
+        }
+    }
+}
+
 task stageOne {
     group = 'Continuous Integration'
     description = 'Executes the first stage of the CI build pipeline'
 }
-stageOne.dependsOn assemble, testClasses, sourceCodeInspection, javadoc, groovydoc
+stageOne.dependsOn assemble, testClasses, sourceCodeInspection, javadoc, groovydoc, sourceJar
 
 task stageTwo {
     group = 'Continuous Integration'
