@@ -52,7 +52,6 @@ test {
     maxParallelForks = Runtime.runtime.availableProcessors()
 }
 
-jacocoTestReport.group = 'Verification'
 
 task ciSourceInspection {
     group = 'Continuous Integration'
@@ -75,11 +74,6 @@ task ciUnitTest( type: Test ) {
     maxParallelForks = Runtime.runtime.availableProcessors()
     testLogging.showStandardStreams = true
 
-    jacoco {
-        append = true
-        destinationFile = file("$buildDir/jacoco/jacocoTest.exec")
-        classDumpFile = file("$buildDir/jacoco/classpathdumps")
-    }
 }
 
 ciUnitTest.dependsOn ciAssemble
@@ -91,12 +85,6 @@ task ciComponentTest( type: Test ) {
     includes = ['**/*ComponentTest.class']
     maxParallelForks = Runtime.runtime.availableProcessors()
     testLogging.showStandardStreams = true
-
-    jacoco {
-        append = true
-        destinationFile = file("$buildDir/jacoco/jacocoTest.exec")
-        classDumpFile = file("$buildDir/jacoco/classpathdumps")
-    }
 }
 
 task ciIntegrationTest( type: Test ) {
@@ -106,12 +94,6 @@ task ciIntegrationTest( type: Test ) {
     includes = ['**/*IntegrationTest.class']
     maxParallelForks = Runtime.runtime.availableProcessors()
     testLogging.showStandardStreams = true
-
-    jacoco {
-        append = true
-        destinationFile = file("$buildDir/jacoco/jacocoTest.exec")
-        classDumpFile = file("$buildDir/jacoco/classpathdumps")
-    }
 }
 
 task ciFunctionalTest {
@@ -137,3 +119,16 @@ task ciRegistration {
     description = 'Registers the artifact with the self-service deployment system'
 }
 ciPublication.dependsOn ciRegistration
+
+task codeCoverageReport( type:JacocoReport ){
+    executionData = files( "$buildDir/jacoco/ciComponentTest.exec", "$buildDir/jacoco/ciIntegrationTest.exec", "$buildDir/jacoco/ciUnitTest.exec")
+    sourceSets sourceSets.main
+    group = 'Verification'
+    reports {
+        xml.enabled true
+        csv.enabled false
+        html.enabled true
+    }
+}
+
+codeCoverageReport.dependsOn ciFunctionalTest
